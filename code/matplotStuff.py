@@ -164,3 +164,90 @@ else:
 #     * **Interpretation:** We look at the p-value. If the p-value is less than a threshold (commonly 0.05), we reject the null hypothesis and conclude the series is likely stationary. If the p-value is greater than 0.05, we fail to reject the null hypothesis and conclude the series is likely non-stationary.
 # 3.  **Differencing:** `.diff()` calculates the difference between consecutive observations (`value[t] - value[t-1]`). This often helps stabilize the mean of a time series, making it stationary. The first value after differencing will always be NaN.
 # 4.  **Which series to use?** If the original series (`value_column_name`) was stationary, you'll typically model that directly. If it wasn't, but the *differenced* series (`differenced_column_name`) *is* stationary, you'll often build your model (like ARIMA) based on the differenced data. The model then needs to be configured to understand it's working with differenced data (e.g., the 'd' parameter in ARIMA).
+# --- Assume 'df' is the DataFrame processed in the previous steps ---
+# --- Assume 'value_column_name' is 'T10Y2Y' ---
+value_column_name = 'T10Y2Y' # Make sure this matches your column
+
+# --- Step 5: Split the Data Chronologically ---
+
+# Calculate the index number for the split point (80% of the data)
+split_point = int(len(df) * 0.8)
+
+# --- FIX: Use .iloc for integer-based slicing ---
+# Select rows up to (but not including) split_point for training
+train_series = df[value_column_name].iloc[:split_point]
+# Select rows from split_point to the end for testing
+test_series = df[value_column_name].iloc[split_point:]
+# --- End of FIX ---
+
+# Verify the split
+print("\n--- Data Splitting ---")
+print(f"Total observations: {len(df)}")
+print(f"Training observations: {len(train_series)} (Index from {train_series.index.min()} to {train_series.index.max()})")
+print(f"Testing observations: {len(test_series)} (Index from {test_series.index.min()} to {test_series.index.max()})")
+
+# Check if the lengths add up
+if len(train_series) + len(test_series) == len(df):
+    print("Train and test set lengths add up correctly.")
+else:
+    print("Warning: Train and test set lengths do not sum to the total!")
+
+# Display the last few training points and first few testing points
+print("\nLast 3 training points:")
+print(train_series.tail(3))
+print("\nFirst 3 testing points:")
+print(test_series.head(3))
+
+# --- Implementation Notes ---
+# 1. We now slice the specific column (Series) df[value_column_name] using .iloc.
+# 2. .iloc[:split_point] takes rows from the beginning up to (excluding) the integer index `split_point`.
+# 3. .iloc[split_point:] takes rows from the integer index `split_point` to the end.
+# 4. This method correctly uses integer positions for splitting, regardless of the index label type (like DatetimeIndex).
+
+import pmdarima as pm # Import pmdarima
+
+# --- Assume 'train_series' is available from the previous step ---
+
+# --- Step 6: Find Best ARIMA Order and Fit Model ---
+print("\n--- Finding Best ARIMA Model using auto_arima ---")
+
+# Use auto_arima to find the best p, q (d=0 since data is stationary)
+# We set seasonal=False as strong daily seasonality is less common in yield spreads
+# trace=True shows the models being tested
+# error_action='ignore', suppress_warnings=True help avoid stopping on non-converging models
+try:
+    auto_model = pm.auto_arima(
+        train_series,
+        start_p=1, start_q=1,   # Starting points for p and q search
+        max_p=5, max_q=5,     # Maximum p and q to test (adjust if needed)
+        d=0,                  # Integration order (0 because data is stationary)
+        seasonal=False,       # No seasonality assumed for daily data
+        stepwise=True,        # Use stepwise algorithm (faster)
+        suppress_warnings=True,
+        error_action='ignore',
+        trace=True            # Print models being tested
+    )
+
+    print("\n--- Best ARIMA Model Found ---")
+    # Print the summary of the best model found
+    # This includes the chosen (p,d,q) order and coefficient values
+    print(auto_model.summary())
+
+    # The 'auto_model' object is now our fitted model
+    fitted_model = auto_model
+
+except ImportError:
+    print("\nError: pmdarima library not found. Please install it: pip install pmdarima")
+    fitted_model = None # Ensure variable exists even on error
+except Exception as e:
+    print(f"\nAn error occurred during auto_arima fitting: {e}")
+    fitted_model = None # Ensure variable exists even on error
+
+# --- Implementation Notes ---
+# 1. Add this code block after the data splitting block in your script.
+# 2. `auto_arima` will test various combinations of p and q (up to max_p, max_q)
+#    and select the one with the best fit based on criteria like AIC (Akaike Information Criterion).
+# 3. Setting `d=0` is crucial because we already determined the series is stationary.
+# 4. `seasonal=False` is a reasonable starting assumption for daily yield spreads. If you suspected a weekly/monthly pattern, you might explore `seasonal=True` with an appropriate `m` value (e.g., m=5 or m=21 for trading days).
+# 5. The `trace=True` output will show you the different ARIMA(p,0,q) models it tries and their AIC scores. The one with the lowest AIC is usually chosen.
+# 6. The `auto_model.summary()` provides detailed information about the coefficients, standard errors, p-values, and diagnostic tests for the chosen model.

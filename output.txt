@@ -1,0 +1,116 @@
+/workspaces/10yearVs2year/code/matplotStuff.py:98: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[value_column_name].fillna(method='ffill', inplace=True)
+/workspaces/10yearVs2year/code/matplotStuff.py:98: FutureWarning: Series.fillna with 'method' is deprecated and will raise in a future version. Use obj.ffill() or obj.bfill() instead.
+  df[value_column_name].fillna(method='ffill', inplace=True)
+/workspaces/10yearVs2year/code/matplotStuff.py:101: FutureWarning: A value is trying to be set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+The behavior will change in pandas 3.0. This inplace method will never work because the intermediate object on which we are setting values always behaves as a copy.
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value) instead, to perform the operation inplace on the original object.
+
+
+  df[value_column_name].fillna(method='bfill', inplace=True)
+/workspaces/10yearVs2year/code/matplotStuff.py:101: FutureWarning: Series.fillna with 'method' is deprecated and will raise in a future version. Use obj.ffill() or obj.bfill() instead.
+  df[value_column_name].fillna(method='bfill', inplace=True)
+Successfully loaded CSV and set 'observation_date' as index.
+
+--- Data Info ---
+<class 'pandas.core.frame.DataFrame'>
+DatetimeIndex: 12752 entries, 1976-06-01 to 2025-04-16
+Data columns (total 1 columns):
+ #   Column  Non-Null Count  Dtype  
+---  ------  --------------  -----  
+ 0   T10Y2Y  12216 non-null  float64
+dtypes: float64(1)
+memory usage: 199.2 KB
+None
+
+--- First 5 Rows (T10Y2Y) ---
+                  T10Y2Y
+observation_date        
+1976-06-01          0.68
+1976-06-02          0.71
+1976-06-03          0.70
+1976-06-04          0.77
+1976-06-07          0.79
+
+--- Last 5 Rows (T10Y2Y) ---
+                  T10Y2Y
+observation_date        
+2025-04-10          0.56
+2025-04-11          0.52
+2025-04-14          0.54
+2025-04-15          0.51
+2025-04-16          0.52
+
+--- Missing Values Count ---
+536
+
+--- Descriptive Statistics ---
+count    12216.000000
+mean         0.854401
+std          0.923789
+min         -2.410000
+25%          0.180000
+50%          0.810000
+75%          1.490000
+max          2.910000
+Name: T10Y2Y, dtype: float64
+
+--- Plotting the Time Series ---
+Plot displayed. Close the plot window to continue.
+
+--- Handling 536 Missing Value(s) ---
+Missing values handled using forward/backward fill.
+
+--- Checking Stationarity of 'T10Y2Y' ---
+ADF Test for: T10Y2Y
+ADF Statistic: -3.1362
+p-value: 0.0240
+Critical Values:
+	1%: -3.4309
+	5%: -2.8618
+	10%: -2.5669
+Result: Evidence against the null hypothesis (p <= 0.05). The 'T10Y2Y' series is likely stationary.
+
+--- Original series 'T10Y2Y' appears stationary. Differencing not applied. ---
+
+--- Data Splitting ---
+Total observations: 12752
+Training observations: 10201 (Index from 1976-06-01 00:00:00 to 2015-07-07 00:00:00)
+Testing observations: 2551 (Index from 2015-07-08 00:00:00 to 2025-04-16 00:00:00)
+Train and test set lengths add up correctly.
+
+Last 3 training points:
+observation_date
+2015-07-03    1.76
+2015-07-06    1.70
+2015-07-07    1.69
+Name: T10Y2Y, dtype: float64
+
+First 3 testing points:
+observation_date
+2015-07-08    1.67
+2015-07-09    1.72
+2015-07-10    1.77
+Name: T10Y2Y, dtype: float64
+Traceback (most recent call last):
+  File "/workspaces/10yearVs2year/code/matplotStuff.py", line 207, in <module>
+    import pmdarima as pm # Import pmdarima
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/codespace/.python/current/lib/python3.12/site-packages/pmdarima/__init__.py", line 52, in <module>
+    from .arima import auto_arima, ARIMA, AutoARIMA, StepwiseContext, decompose
+  File "/home/codespace/.python/current/lib/python3.12/site-packages/pmdarima/arima/__init__.py", line 5, in <module>
+    from .approx import *
+  File "/home/codespace/.python/current/lib/python3.12/site-packages/pmdarima/arima/approx.py", line 9, in <module>
+    from ..utils.array import c, check_endog
+  File "/home/codespace/.python/current/lib/python3.12/site-packages/pmdarima/utils/__init__.py", line 5, in <module>
+    from .array import *
+  File "/home/codespace/.python/current/lib/python3.12/site-packages/pmdarima/utils/array.py", line 13, in <module>
+    from ._array import C_intgrt_vec
+  File "pmdarima/utils/_array.pyx", line 1, in init pmdarima.utils._array
+ValueError: numpy.dtype size changed, may indicate binary incompatibility. Expected 96 from C header, got 88 from PyObject
