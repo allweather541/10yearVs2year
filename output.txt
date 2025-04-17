@@ -16,6 +16,36 @@ For example, when doing 'df[col].method(value, inplace=True)', try using 'df.met
   df[value_column_name].fillna(method='bfill', inplace=True)
 /workspaces/10yearVs2year/code/matplotStuff.py:101: FutureWarning: Series.fillna with 'method' is deprecated and will raise in a future version. Use obj.ffill() or obj.bfill() instead.
   df[value_column_name].fillna(method='bfill', inplace=True)
+/home/codespace/.local/lib/python3.12/site-packages/sklearn/utils/deprecation.py:151: FutureWarning: 'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8.
+  warnings.warn(
+/home/codespace/.local/lib/python3.12/site-packages/sklearn/utils/deprecation.py:151: FutureWarning: 'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8.
+  warnings.warn(
+/home/codespace/.local/lib/python3.12/site-packages/sklearn/utils/deprecation.py:151: FutureWarning: 'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8.
+  warnings.warn(
+/home/codespace/.local/lib/python3.12/site-packages/sklearn/utils/deprecation.py:151: FutureWarning: 'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8.
+  warnings.warn(
+/home/codespace/.local/lib/python3.12/site-packages/sklearn/utils/deprecation.py:151: FutureWarning: 'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8.
+  warnings.warn(
+/home/codespace/.local/lib/python3.12/site-packages/sklearn/utils/deprecation.py:151: FutureWarning: 'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8.
+  warnings.warn(
+/home/codespace/.local/lib/python3.12/site-packages/sklearn/utils/deprecation.py:151: FutureWarning: 'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8.
+  warnings.warn(
+/home/codespace/.local/lib/python3.12/site-packages/sklearn/utils/deprecation.py:151: FutureWarning: 'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8.
+  warnings.warn(
+/home/codespace/.local/lib/python3.12/site-packages/sklearn/utils/deprecation.py:151: FutureWarning: 'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8.
+  warnings.warn(
+/home/codespace/.local/lib/python3.12/site-packages/sklearn/utils/deprecation.py:151: FutureWarning: 'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8.
+  warnings.warn(
+/home/codespace/.local/lib/python3.12/site-packages/sklearn/utils/deprecation.py:151: FutureWarning: 'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8.
+  warnings.warn(
+/home/codespace/.local/lib/python3.12/site-packages/sklearn/utils/deprecation.py:151: FutureWarning: 'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8.
+  warnings.warn(
+/home/codespace/.local/lib/python3.12/site-packages/sklearn/utils/deprecation.py:151: FutureWarning: 'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8.
+  warnings.warn(
+/home/codespace/.local/lib/python3.12/site-packages/sklearn/utils/deprecation.py:151: FutureWarning: 'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8.
+  warnings.warn(
+/home/codespace/.local/lib/python3.12/site-packages/sklearn/utils/deprecation.py:151: FutureWarning: 'force_all_finite' was renamed to 'ensure_all_finite' in 1.6 and will be removed in 1.8.
+  warnings.warn(
 Successfully loaded CSV and set 'observation_date' as index.
 
 --- Data Info ---
@@ -98,19 +128,85 @@ observation_date
 2015-07-09    1.72
 2015-07-10    1.77
 Name: T10Y2Y, dtype: float64
-Traceback (most recent call last):
-  File "/workspaces/10yearVs2year/code/matplotStuff.py", line 207, in <module>
-    import pmdarima as pm # Import pmdarima
-    ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/codespace/.python/current/lib/python3.12/site-packages/pmdarima/__init__.py", line 52, in <module>
-    from .arima import auto_arima, ARIMA, AutoARIMA, StepwiseContext, decompose
-  File "/home/codespace/.python/current/lib/python3.12/site-packages/pmdarima/arima/__init__.py", line 5, in <module>
-    from .approx import *
-  File "/home/codespace/.python/current/lib/python3.12/site-packages/pmdarima/arima/approx.py", line 9, in <module>
-    from ..utils.array import c, check_endog
-  File "/home/codespace/.python/current/lib/python3.12/site-packages/pmdarima/utils/__init__.py", line 5, in <module>
-    from .array import *
-  File "/home/codespace/.python/current/lib/python3.12/site-packages/pmdarima/utils/array.py", line 13, in <module>
-    from ._array import C_intgrt_vec
-  File "pmdarima/utils/_array.pyx", line 1, in init pmdarima.utils._array
-ValueError: numpy.dtype size changed, may indicate binary incompatibility. Expected 96 from C header, got 88 from PyObject
+
+--- Finding Best ARIMA Model using auto_arima ---
+Performing stepwise search to minimize aic
+ ARIMA(1,0,1)(0,0,0)[0]             : AIC=-33222.587, Time=0.81 sec
+ ARIMA(0,0,0)(0,0,0)[0]             : AIC=35146.497, Time=0.60 sec
+ ARIMA(1,0,0)(0,0,0)[0]             : AIC=inf, Time=0.66 sec
+ ARIMA(0,0,1)(0,0,0)[0]             : AIC=21539.423, Time=1.22 sec
+ ARIMA(2,0,1)(0,0,0)[0]             : AIC=-33232.825, Time=1.33 sec
+ ARIMA(2,0,0)(0,0,0)[0]             : AIC=inf, Time=1.06 sec
+ ARIMA(3,0,1)(0,0,0)[0]             : AIC=-33225.737, Time=2.07 sec
+ ARIMA(2,0,2)(0,0,0)[0]             : AIC=-33228.366, Time=2.77 sec
+ ARIMA(1,0,2)(0,0,0)[0]             : AIC=-33224.188, Time=1.48 sec
+ ARIMA(3,0,0)(0,0,0)[0]             : AIC=inf, Time=0.86 sec
+ ARIMA(3,0,2)(0,0,0)[0]             : AIC=-33225.327, Time=1.50 sec
+ ARIMA(2,0,1)(0,0,0)[0] intercept   : AIC=-33223.428, Time=18.46 sec
+
+Best model:  ARIMA(2,0,1)(0,0,0)[0]          
+Total fit time: 32.829 seconds
+
+--- Best ARIMA Model Found ---
+                               SARIMAX Results                                
+==============================================================================
+Dep. Variable:                      y   No. Observations:                10201
+Model:               SARIMAX(2, 0, 1)   Log Likelihood               16620.412
+Date:                Thu, 17 Apr 2025   AIC                         -33232.825
+Time:                        01:37:13   BIC                         -33203.904
+Sample:                    06-01-1976   HQIC                        -33223.045
+                         - 07-07-2015                                         
+Covariance Type:                  opg                                         
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+ar.L1          1.9083      0.019     98.904      0.000       1.870       1.946
+ar.L2         -0.9083      0.019    -47.092      0.000      -0.946      -0.871
+ma.L1         -0.8898      0.021    -41.894      0.000      -0.931      -0.848
+sigma2         0.0022   1.18e-05    191.168      0.000       0.002       0.002
+===================================================================================
+Ljung-Box (L1) (Q):                   0.02   Jarque-Bera (JB):             71545.75
+Prob(Q):                              0.90   Prob(JB):                         0.00
+Heteroskedasticity (H):               0.41   Skew:                             0.11
+Prob(H) (two-sided):                  0.00   Kurtosis:                        15.97
+===================================================================================
+
+Warnings:
+[1] Covariance matrix calculated using the outer product of gradients (complex-step).
+
+--- Making Forecasts on the Test Set Period ---
+Generated 2551 predictions.
+
+First 5 Predictions:
+observation_date
+2015-07-08    1.688632
+2015-07-09    1.687265
+2015-07-10    1.685899
+2015-07-13    1.684534
+2015-07-14    1.683169
+dtype: float64
+
+Last 5 Predictions:
+observation_date
+2025-04-10    0.213521
+2025-04-11    0.213347
+2025-04-14    0.213174
+2025-04-15    0.213001
+2025-04-16    0.212828
+dtype: float64
+
+Confidence Intervals (first 5):
+[[1.59568507 1.78157955]
+ [1.55459608 1.81993458]
+ [1.52200881 1.84978937]
+ [1.49376817 1.87529909]
+ [1.46829118 1.89804676]]
+
+--- Evaluating Forecast Performance ---
+Mean Absolute Error (MAE): 0.4585
+Mean Squared Error (MSE):  0.2999
+Root Mean Squared Error (RMSE): 0.5476
+Mean Absolute Percentage Error (MAPE): 150.58%
+
+--- Generating and Saving Forecast Plot ---
+Forecast plot successfully saved to 'forecast_vs_actual.png'

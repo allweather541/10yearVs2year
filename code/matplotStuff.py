@@ -251,3 +251,145 @@ except Exception as e:
 # 4. `seasonal=False` is a reasonable starting assumption for daily yield spreads. If you suspected a weekly/monthly pattern, you might explore `seasonal=True` with an appropriate `m` value (e.g., m=5 or m=21 for trading days).
 # 5. The `trace=True` output will show you the different ARIMA(p,0,q) models it tries and their AIC scores. The one with the lowest AIC is usually chosen.
 # 6. The `auto_model.summary()` provides detailed information about the coefficients, standard errors, p-values, and diagnostic tests for the chosen model.
+
+# --- Assume 'fitted_model' is the result from auto_arima (Step 6) ---
+# --- Assume 'test_series' is available from the splitting step (Step 5) ---
+# --- Make sure pandas is imported as pd ---
+import pandas as pd
+
+# --- Step 7: Make Forecasts ---
+if fitted_model is not None:
+    print("\n--- Making Forecasts on the Test Set Period ---")
+
+    # Determine the number of periods to forecast (length of the test set)
+    n_periods_to_forecast = len(test_series)
+
+    # Generate predictions using the fitted model
+    # For standard ARIMA, predict typically forecasts the step ahead,
+    # then uses that forecast to predict the next step, and so on.
+    # Use try-except block for robustness
+    try:
+        predictions, conf_int = fitted_model.predict(
+            n_periods=n_periods_to_forecast,
+            return_conf_int=True # Also return confidence intervals
+        )
+
+        # The 'predictions' object is a numpy array initially.
+        # It's helpful to convert it to a pandas Series with the test set's index.
+        predictions_series = pd.Series(predictions, index=test_series.index)
+
+        print(f"Generated {len(predictions_series)} predictions.")
+        print("\nFirst 5 Predictions:")
+        print(predictions_series.head())
+        print("\nLast 5 Predictions:")
+        print(predictions_series.tail())
+
+        # The conf_int is a numpy array [:, 0] is lower bound, [:, 1] is upper bound
+        print("\nConfidence Intervals (first 5):")
+        print(conf_int[:5])
+
+    except Exception as pred_e:
+        print(f"\nAn error occurred during prediction: {pred_e}")
+        predictions_series = None # Ensure variable is None if prediction fails
+        conf_int = None
+
+else:
+    print("\nSkipping prediction step because model fitting failed or model is None.")
+    predictions_series = None # Ensure variable exists but is None
+    conf_int = None # Ensure variable exists but
+
+
+# --- Make sure necessary libraries are imported ---
+# You likely already have numpy as np and matplotlib.pyplot as plt imported earlier
+# Ensure these specific imports are present:
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+import numpy as np
+import matplotlib.pyplot as plt # Needed for saving the plot
+
+# --- Assume 'test_series' (actual values) and 'predictions_series' (forecasts)
+# --- are available from previous steps.
+# --- Assume 'conf_int' (confidence intervals) is also available from Step 7.
+# --- Assume 'value_column_name' contains the name of your target column ('T10Y2Y')
+
+# --- Step 8: Evaluate the Forecasts ---
+# Check if predictions were successfully generated in Step 7
+if predictions_series is not None and test_series is not None:
+    print("\n--- Evaluating Forecast Performance ---")
+
+    # Ensure both series are aligned and have no NaNs for comparison
+    # (Should be okay here, but good practice)
+    common_index = test_series.index.intersection(predictions_series.index)
+    test_actual = test_series.loc[common_index].dropna()
+    test_predicted = predictions_series.loc[common_index].dropna()
+
+    # Check if we have valid data after alignment and dropping NaNs
+    if len(test_actual) == len(test_predicted) and len(test_actual) > 0:
+        # Calculate Mean Absolute Error (MAE)
+        # Average absolute difference between prediction and actual
+        mae = mean_absolute_error(test_actual, test_predicted)
+        print(f"Mean Absolute Error (MAE): {mae:.4f}")
+
+        # Calculate Mean Squared Error (MSE)
+        # Average of the squared differences (penalizes large errors more)
+        mse = mean_squared_error(test_actual, test_predicted)
+        print(f"Mean Squared Error (MSE):  {mse:.4f}")
+
+        # Calculate Root Mean Squared Error (RMSE)
+        # Square root of MSE (puts the error back in the original units)
+        rmse = np.sqrt(mse)
+        print(f"Root Mean Squared Error (RMSE): {rmse:.4f}")
+
+        # Optional: Calculate Mean Absolute Percentage Error (MAPE)
+        # Be cautious if test_actual can be zero or close to zero
+        # Filter out near-zero actual values to avoid division by zero
+        non_zero_mask = np.abs(test_actual) > 1e-6 # Check if actual value is tiny
+        if np.any(non_zero_mask):
+             mape = np.mean(np.abs((test_actual[non_zero_mask] - test_predicted[non_zero_mask]) / test_actual[non_zero_mask])) * 100
+             print(f"Mean Absolute Percentage Error (MAPE): {mape:.2f}%")
+        else:
+             print("MAPE calculation skipped as actual values are near zero.")
+
+        # --- Plotting Section (Saving the plot) ---
+        print("\n--- Generating and Saving Forecast Plot ---")
+        try:
+            plt.figure(figsize=(12, 6))
+            plt.plot(test_actual.index, test_actual, label='Actual Test Data', color='blue', linewidth=1.5)
+            plt.plot(predictions_series.index, predictions_series, label='ARIMA Forecast', color='red', alpha=0.8, linewidth=1.5)
+
+            # Optionally plot confidence intervals if desired (using 'conf_int' from predict step)
+            # Check if conf_int exists and has the right shape
+            if 'conf_int' in locals() and conf_int is not None and conf_int.shape[0] == len(predictions_series):
+                 plt.fill_between(predictions_series.index, conf_int[:, 0], conf_int[:, 1], color='red', alpha=0.1, label='95% Confidence Interval')
+            else:
+                 print("(Confidence intervals not plotted due to issues or unavailability)")
+
+            plt.title(f'{value_column_name}: Actual vs. ARIMA(2,0,1) Forecast')
+            plt.xlabel('Date')
+            plt.ylabel('Yield Difference')
+            plt.legend()
+            plt.grid(True)
+            plt.tight_layout()
+
+            # --- Save the plot to a file ---
+            plot_filename = 'forecast_vs_actual.png'
+            plt.savefig(plot_filename)
+            print(f"Forecast plot successfully saved to '{plot_filename}'")
+
+            # plt.show() # Explicitly commented out: not useful in non-interactive environments
+
+            plt.close() # Close the plot figure to free memory
+
+        except Exception as plot_e:
+            print(f"\nCould not generate or save plot: {plot_e}")
+
+    else:
+        print("Could not perform evaluation. Check lengths or content of actual and predicted series after alignment.")
+
+else:
+    print("\nSkipping evaluation step because model fitting or prediction failed earlier.")
+
+# --- Implementation Notes ---
+# 1. This code calculates MAE, MSE, RMSE, and optionally MAPE, printing them to your console.
+# 2. It then generates a plot comparing the actual test data (`test_series`) against the model's forecasts (`predictions_series`).
+# 3. Crucially, instead of `plt.show()`, it uses `plt.savefig('forecast_vs_actual.png')` to save the plot as an image file in your current working directory within Codespaces.
+# 4. After the script runs, you should be able to find `forecast_vs_actual.png` in the file explorer panel in VS Code (usually on the left) and click on it to view or download it.
